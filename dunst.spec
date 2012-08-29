@@ -1,13 +1,13 @@
-%define githubuser knopwob
-%define gitlast g63ceed3
-%define gitdir c4b2274
+%global githubuser knopwob
+%global gitlast g63ceed3
+%global gitdir c4b2274
 
 Name:     dunst
 Version:  0.3.1 
-Release:  1%{?dist}
-Summary:  Dmenu-ish lightweight notification-daemon
+Release:  2%{?dist}
+Summary:  Dmenu-ish notification-daemon
 Group:    User Interface/X
-License:  BSD
+License:  BSD and MIT
 URL:      http://github.com/knopwob/dunst
 Source0:  http://github.com/knopwob/dunst/tarball/v%{version}/%{githubuser}-%{name}-v%{version}-0-%{gitlast}.tar.gz
 
@@ -21,9 +21,7 @@ BuildRequires: libxdg-basedir-devel
 BuildRequires: dbus-devel
 
 %description
-Dunst is a lightweight notification-daemon for the libnotify. It displays
-messages received via dbus or as command line argument in a fashion similar
-to dmenu.
+Dunst is a highly configurable and lightweight notification daemon.
 
 
 %prep
@@ -31,7 +29,9 @@ to dmenu.
 
 
 %build
-make %{?_smp_mflags} VERSION=%{version} PREFIX=%{_prefix}
+# until EXTRACFLAGS is added upstream, we use unused STATIC variable:
+# https://github.com/knopwob/dunst/issues/56
+make %{?_smp_mflags} VERSION=%{version} PREFIX=%{_prefix} STATIC="%{optflags}"
 
 
 %install
@@ -46,5 +46,8 @@ make install DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %{_datadir}/man/man1/%{name}.1.gz
 
 %changelog
+* Wed Aug 29 2012 Lukas Zapletal <lzap+rpm[@]redhat.com> - 0.3.1-2
+- package review
+
 * Mon Aug 27 2012 Lukas Zapletal <lzap+rpm[@]redhat.com> - 0.3.1-1
 - initial version

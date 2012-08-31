@@ -10,6 +10,7 @@ Group:    User Interface/X
 License:  BSD and MIT
 URL:      http://github.com/knopwob/dunst
 Source0:  http://github.com/knopwob/dunst/tarball/v%{version}/%{githubuser}-%{name}-v%{version}-0-%{gitlast}.tar.gz
+Patch0:   %{name}-fedoraflags.patch
 
 Requires: dbus
 
@@ -27,11 +28,12 @@ Dunst is a highly configurable and lightweight notification daemon.
 %prep
 %setup -q -n %{githubuser}-%{name}-%{gitdir}
 
+# until EXTRACFLAGS is added upstream, see https://github.com/knopwob/dunst/issues/56
+%patch0 -p1
+
 
 %build
-# until EXTRACFLAGS is added upstream, we use unused STATIC variable:
-# https://github.com/knopwob/dunst/issues/56
-make %{?_smp_mflags} VERSION=%{version} PREFIX=%{_prefix} STATIC="%{optflags}"
+make %{?_smp_mflags} VERSION=%{version} PREFIX=%{_prefix} EXTRACFLAGS="%{optflags}"
 
 
 %install

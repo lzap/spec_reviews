@@ -3,9 +3,9 @@
 %global gitdir c4b2274
 
 Name:     dunst
-Version:  0.3.1 
-Release:  2%{?dist}
-Summary:  Dmenu-ish notification-daemon
+Version:  0.3.1
+Release:  3%{?dist}
+Summary:  Simple and configurable notification-daemon
 Group:    User Interface/X
 License:  BSD and MIT
 URL:      http://github.com/knopwob/dunst
@@ -22,7 +22,8 @@ BuildRequires: libxdg-basedir-devel
 BuildRequires: dbus-devel
 
 %description
-Dunst is a highly configurable and lightweight notification daemon.
+Dunst is a highly configurable and lightweight notification daemon with the
+similar look and feel to dmenu.
 
 
 %prep
@@ -44,10 +45,13 @@ make install DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %doc AUTHORS CHANGELOG LICENSE README.pod
 %{_bindir}/%{name}
 %{_datadir}/dbus-1/services/org.%{githubuser}.%{name}.service
-%{_datadir}/%{name}/dunstrc
+%{_datadir}/%{name}
 %{_datadir}/man/man1/%{name}.1.gz
 
 %changelog
+* Mon Sep 03 2012 Lukas Zapletal <lzap+rpm[@]redhat.com> - 0.3.1-3
+- package review
+
 * Wed Aug 29 2012 Lukas Zapletal <lzap+rpm[@]redhat.com> - 0.3.1-2
 - package review
 

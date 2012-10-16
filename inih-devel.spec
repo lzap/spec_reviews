@@ -5,8 +5,8 @@ Summary:  Simple INI file parser
 
 Group:    Development/Libraries
 License:  BSD
-URL:      http://inih.googlecode.com/files/inih_%{version}.zip
-Source0:  inih_%{version}.zip
+URL:      http://inih.googlecode.com/
+Source0:  http://inih.googlecode.com/files/inih_%{version}.zip
 Provides: inih-static = %{version}-%{release}
 
 %description
@@ -27,11 +27,14 @@ popd
 
 %install
 mkdir -p %{buildroot}%{_libdir}
+mkdir -p %{buildroot}%{_includedir}
+install -m 644 ini.h %{buildroot}%{_includedir}/ini.h
 install -m 644 extra/libinih.a %{buildroot}%{_libdir}/libinih.a
 
 
 %files
 %doc LICENSE.txt README.txt
+%{_includedir}/ini.h
 %{_libdir}/libinih.a
 
 

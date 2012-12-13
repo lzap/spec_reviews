@@ -1,64 +1,87 @@
-%{!?ruby_sitelib: %global ruby_sitelib %(ruby -rrbconfig -e 'puts Config::CONFIG["sitelibdir"] ')}
-%{!?ruby_sitearch: %global ruby_sitearch %(ruby -rrbconfig -e 'puts Config::CONFIG["sitearchdir"] ')}
-%global gemdir %(ruby -rubygems -e 'puts Gem::dir' 2>/dev/null)
-%global gemname virt
-%global geminstdir %{gemdir}/gems/%{gemname}-%{version}
+%global gem_name virt
+%if 0%{?rhel} == 6
+%global gem_dir %(ruby -rubygems -e 'puts Gem::dir' 2>/dev/null)
+%global gem_docdir %{gem_dir}/doc/%{gem_name}-%{version}
+%global gem_cache %{gem_dir}/cache/%{gem_name}-%{version}.gem
+%global gem_spec %{gem_dir}/specifications/%{gem_name}-%{version}.gemspec
+%global gem_instdir %{gem_dir}/gems/%{gem_name}-%{version}
+%endif
 
 Summary: Simple to use ruby interface to libvirt
-Name: rubygem-%{gemname}
-Version: 0.1.0
-Release: 2%{?dist}
-Group: Development/Languages
-License: GPLv3
+Name: rubygem-%{gem_name}
+
+Version: 0.2.1
+Release: 3%{dist}
+Group: Development/Ruby
+License: Distributable
 URL: https://github.com/ohadlevy/virt
-Source0: http://rubygems.org/gems/%{gemname}-%{version}.gem
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-
-BuildArch: noarch
-
+Source0: %{gem_name}-%{version}.gem
 Requires: rubygems
-Requires: ruby-libvirt
+%if 0%{?rhel} == 6 || 0%{?fedora} < 17
+Requires: ruby(abi) = 1.8
+%else
+Requires: ruby(abi) = 1.9.1
+%endif
+%if 0%{?fedora}
+BuildRequires: rubygems-devel
+%endif
+Requires: rubygem-ruby-libvirt 
+BuildRequires: ruby 
 BuildRequires: rubygems
+BuildArch: noarch
+Provides: rubygem(virt) = %{version}
 
-Provides: rubygem(%{gemname}) = %{version}
+%define gembuilddir %{buildroot}%{gem_dir}
 
 %description
-Simplified interface to use ruby the libvirt ruby library.
+Simplied interface to use ruby the libvirt ruby library
 
+
+%package doc
+BuildArch:  noarch
+Requires:   %{name} = %{version}-%{release}
+Summary:    Documentation for rubygem-%{gem_name}
+
+%description doc
+This package contains documentation for rubygem-%{gem_name}.
 
 %prep
-
+%setup -T -c
 
 %build
 
-
 %install
-rm -rf %{buildroot}
-mkdir -p %{buildroot}%{gemdir}
-gem install --local --install-dir %{buildroot}%{gemdir} \
-            --force --rdoc %{SOURCE0}
-
-# there is a .document hidden file being distributed
-find %{buildroot}/ -name .document -print0 | xargs -0 /bin/rm -f
-
-
-%clean
-rm -rf %{buildroot}
-
+%{__rm} -rf %{buildroot}
+mkdir -p %{gembuilddir}
+gem install --local --install-dir %{gembuilddir} --force %{SOURCE0}
+rm -rf %{buildroot}%{gem_instdir}/.yardoc
 
 %files
-%defattr(-, root, root, -)
-%{geminstdir}
-%doc %{gemdir}/doc/%{gemname}-%{version}
-%doc %{geminstdir}/LICENSE.txt
-%doc %{geminstdir}/README.rdoc
-%{gemdir}/cache/%{gemname}-%{version}.gem
-%{gemdir}/specifications/%{gemname}-%{version}.gemspec
+%dir %{gem_instdir}
+%{gem_instdir}/lib
+%{gem_instdir}/templates
+%{gem_instdir}/LICENSE.txt
+%exclude %{gem_cache}
+%exclude %{gem_instdir}/Gemfile.lock
+%{gem_spec}
 
+%files doc
+%{gem_instdir}/Rakefile
+%{gem_instdir}/test
+%{gem_instdir}/VERSION
+%{gem_instdir}/README.rdoc
+%{gem_instdir}/Gemfile
+%{gem_instdir}/.document
+%{gem_instdir}/virt.gemspec
+%{gem_docdir}
 
 %changelog
-* Thu Oct 06 2011 Lukas Zapletal <lzap+rpm[@]redhat.com> - 0.1.0-2
-- Fixed spec
+* Fri Sep 07 2012 Miroslav Suchý <msuchy@redhat.com> 0.2.1-3
+- fix BR (msuchy@redhat.com)
 
-* Mon Jan 31 2011 Lukáš Zapletal <lzap+spam@redhat.com> - 0.1.0-1
-- Initial package
+* Fri Sep 07 2012 Miroslav Suchý <msuchy@redhat.com> 0.2.1-2
+- polish the spec (msuchy@redhat.com)
+
+* Thu Sep 06 2012 Miroslav Suchý <msuchy@redhat.com> 0.2.1-1
+- new package built with tito
+

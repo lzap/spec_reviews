@@ -28,6 +28,9 @@ BuildRequires: rubygems-devel
 Requires: rubygem-ruby-libvirt 
 BuildRequires: ruby 
 BuildRequires: rubygems
+BuildRequires: rubygem-rake
+BuildRequires: rubygem-jeweler
+BuildRequires: rubygem-rcov
 BuildArch: noarch
 Provides: rubygem(virt) = %{version}
 
@@ -49,6 +52,9 @@ This package contains documentation for rubygem-%{gem_name}.
 %setup -T -c
 
 %build
+
+%check
+rake test
 
 %install
 %{__rm} -rf %{buildroot}

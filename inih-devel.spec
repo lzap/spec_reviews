@@ -1,7 +1,10 @@
+# This is a static library - no debuginfo
+%global debug_package %{nil}
+
 Name:     inih-devel
 Version:  r26
 Release:  1%{?dist}
-Summary:  Simple INI file parser
+Summary:  Simple INI file parser library
 
 Group:    Development/Libraries
 License:  BSD

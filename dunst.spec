@@ -1,16 +1,11 @@
-%global githubuser knopwob
-%global gitlast g63ceed3
-%global gitdir c4b2274
-
 Name:     dunst
-Version:  0.3.1
-Release:  3%{?dist}
+Version:  0.5.0
+Release:  1%{?dist}
 Summary:  Simple and configurable notification-daemon
 Group:    User Interface/X
 License:  BSD and MIT
-URL:      http://github.com/knopwob/dunst
-Source0:  http://github.com/knopwob/dunst/tarball/v%{version}/%{githubuser}-%{name}-v%{version}-0-%{gitlast}.tar.gz
-Patch0:   %{name}-fedoraflags.patch
+URL:      http://www.knopwob.org/dunst
+Source0:  http://www.knopwob.org/public/dunst-release/%{name}-%{version}.tar.bz2
 
 Requires: dbus
 
@@ -27,10 +22,7 @@ similar look and feel to dmenu.
 
 
 %prep
-%setup -q -n %{githubuser}-%{name}-%{gitdir}
-
-# until EXTRACFLAGS is added upstream, see https://github.com/knopwob/dunst/issues/56
-%patch0 -p1
+%setup -q
 
 
 %build
@@ -44,11 +36,15 @@ make install DESTDIR=%{buildroot} PREFIX=%{_prefix}
 %files
 %doc AUTHORS CHANGELOG LICENSE README.pod
 %{_bindir}/%{name}
-%{_datadir}/dbus-1/services/org.%{githubuser}.%{name}.service
+%{_datadir}/dbus-1/services/org.knopwob.%{name}.service
 %{_datadir}/%{name}
 %{_datadir}/man/man1/%{name}.1.gz
 
 %changelog
+* Mon Jan 28 2013 Lukas Zapletal <lzap+rpm[@]redhat.com> - 0.5.0-1
+- version bump
+- inih library is no longer required
+
 * Mon Sep 03 2012 Lukas Zapletal <lzap+rpm[@]redhat.com> - 0.3.1-3
 - package review
 

@@ -1,22 +1,28 @@
-%define name pagekite
-%define version 0.5.5a
-%define unmangled_version 0.5.5a
-%define unmangled_version 0.5.5a
-%define release 0pagekite_fc14fc15fc16
+%if 0%{?rhel} && 0%{?rhel} <= 5
+  %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+  %{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
+%endif
 
-Summary: PageKite makes localhost servers visible to the world.
-Name: %{name}
-Version: %{version}
-Release: %{release}
-Source0: %{name}-%{unmangled_version}.tar.gz
-License: AGPLv3+
-Group: Development/Libraries
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-Prefix: %{_prefix}
-BuildArch: noarch
-Vendor: PageKite Packaging Team <packages@pagekite.net>
-Requires: python-SocksipyChain
-Url: http://pagekite.org/
+Name:       pagekite
+Version:    0.5.5a
+Release:    1
+Summary:    PageKite makes localhost servers visible to the world
+
+Group:      Development/Libraries
+License:    AGPLv3+
+Url:        http://pagekite.org/
+Source0:    http://pagekite.net/pk/src/%{name}-%{version}.tar.gz
+
+%if 0%{?rhel} && 0%{?rhel} <= 5
+BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+%endif
+
+BuildArch:  noarch
+
+Requires:   python-SocksipyChain
+Requires(postun): initscripts
+
+BuildRequires:  python-devel
 
 %description
 PageKite is a system for running publicly visible servers (generally
@@ -33,82 +39,78 @@ as well to clients supporting HTTP Proxies.
 
 
 %prep
-%setup -n %{name}-%{unmangled_version} -n %{name}-%{unmangled_version}
+%setup -q
 
 %build
-python setup.py build
 
 %install
-# This is a replacement for the default disttools RPM build method
-# which gets the file lists right, including the byte-compiled files.
-#
-# We also process our man-pages here.
+%if 0%{?rhel} && 0%{?rhel} <= 5
+  %{__rm} -rf $RPM_BUILD_ROOT
+%endif
 
-python setup.py install --single-version-externally-managed --root=$RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT%{python_sitelib}/%{name}
+install -d $RPM_BUILD_ROOT%{python_sitelib}/%{name}/proto
+install -d $RPM_BUILD_ROOT%{python_sitelib}/%{name}/ui
+install -pm 0644 %{name}/*py $RPM_BUILD_ROOT%{python_sitelib}/%{name}/
+install -pm 0644 %{name}/proto/*py $RPM_BUILD_ROOT%{python_sitelib}/%{name}/proto/
+install -pm 0644 %{name}/ui/*py $RPM_BUILD_ROOT%{python_sitelib}/%{name}/ui/
 
-for manpage in $(cd doc && echo *.1); do
-  mkdir -m 755 -p $RPM_BUILD_ROOT/usr/share/man/man1/
-  install -v -m 644 doc/$manpage $RPM_BUILD_ROOT/usr/share/man/man1/
-  gzip --verbose $RPM_BUILD_ROOT/usr/share/man/man1/$manpage
-done
+install -Dpm 0755 scripts/%{name} $RPM_BUILD_ROOT%{_bindir}/%{name}
+install -Dpm 0755 scripts/lapcat $RPM_BUILD_ROOT%{_bindir}/lapcat
 
-mkdir -m 755 -p $RPM_BUILD_ROOT/etc/pagekite.d/default
-for rcfile in etc/pagekite.d/*; do
-  install -v -m 644 $rcfile $RPM_BUILD_ROOT/etc/pagekite.d/default/
-done
-chmod 600 $RPM_BUILD_ROOT/etc/pagekite.d/default/*account*
+install -Dpm 0644 etc/sysconfig/%{name}.fedora $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/%{name}
+install -Dpm 0644 etc/sysconfig/%{name}.fedora $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/%{name}
+install -Dpm 0755 etc/init.d/%{name}.fedora $RPM_BUILD_ROOT%{_initrddir}/%{name}
+install -Dpm 0644 etc/logrotate.d/%{name}.fedora $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/%{name}
 
-find $RPM_BUILD_ROOT -type f \
-  |sed -e "s|^$RPM_BUILD_ROOT/*|/|" \
-       -e 's|/[^/]*$||' \
-  |uniq >INSTALLED_FILES
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/pagekite.d/default/
+install -Dpm 0644 etc/pagekite.d/* $RPM_BUILD_ROOT%{_sysconfdir}/pagekite.d/default/
+install -Dpm 0600 etc/pagekite.d/10_account.rc $RPM_BUILD_ROOT%{_sysconfdir}/pagekite.d/default/
 
-mkdir -m 755 -p $RPM_BUILD_ROOT/var/log/pagekite
-echo /var/log/pagekite >>INSTALLED_FILES
+install -Dpm 0644 doc/%{name}.1 $RPM_BUILD_ROOT%{_mandir}/man1/%{name}.1
+install -Dpm 0644 doc/lapcat.1 $RPM_BUILD_ROOT%{_mandir}/man1/lapcat.1
 
-for where in init.d logrotate.d sysconfig; do
-  if [ -e etc/$where/pagekite.fedora ]; then
-    mkdir -m 755 -p $RPM_BUILD_ROOT/etc/$where
-    install -v -m 755 etc/$where/pagekite.fedora $RPM_BUILD_ROOT/etc/$where/pagekite
-    echo /etc/$where/pagekite >>INSTALLED_FILES
-  fi
-done
+install -d -m 0755 $RPM_BUILD_ROOT/%{_localstatedir}/log/pagekite
 
 
+%if 0%{?rhel} && 0%{?rhel} <= 5
 %clean
-rm -rf $RPM_BUILD_ROOT
+%{__rm} -rf $RPM_BUILD_ROOT
+%endif
+
 
 %post
-# HACK: Enable default config files, without overwriting.
-cd /etc/pagekite.d/default
-for conffile in *; do
-  [ -e ../$conffile ] || cp -a $conffile ..
-done
-
-# Make sure PageKite is restarted if necessary
-chkconfig --add pagekite || true
-service pagekite status && service pagekite restart
-
+/sbin/chkconfig --add %{name}
 
 
 %preun
-
-(service pagekite status >/dev/null \
-  && service pagekite stop \
-  || true)
-
-(chkconfig --del pagekite || true)
-
-# HACK: uninstall config files that have not changed.
-cd /etc/pagekite.d/default
-for conffile in *; do
-  if [ -f "../$conffile" ]; then
-    md5org=$(md5sum "$conffile" |awk '{print $1}')
-    md5act=$(md5sum "../$conffile" |awk '{print $1}')
-    [ "$md5org" = "$md5act" ] && rm -f "../$conffile"
-  fi
-done
+if [ $1 -eq 0 ] ; then
+    /sbin/service %{name} stop >/dev/null 2>&1
+    /sbin/chkconfig --del %{name}
+fi
 
 
-%files -f INSTALLED_FILES
-%defattr(-,root,root)
+%postun
+if [ "$1" -ge "1" ] ; then
+    /sbin/service %{name} condrestart >/dev/null 2>&1 || :
+fi
+
+
+%files
+%defattr(-,root,root,-)
+%doc COPYING README.md TODO.md
+%{python_sitelib}/%{name}/
+%{_bindir}/%{name}
+%{_bindir}/lapcat
+%{_sysconfdir}/sysconfig/%{name}
+%{_initrddir}/%{name}
+%{_sysconfdir}/logrotate.d/%{name}
+%{_sysconfdir}/pagekite.d/default/*
+%{_mandir}/man1/%{name}.1*
+%{_mandir}/man1/lapcat.1*
+%{_localstatedir}/log/pagekite
+
+
+%changelog
+* Fri Feb 08 2013 Lukas Zapletal <lzap+rpm[@]redhat.com> - 0.5.5a-1
+- Initial version.

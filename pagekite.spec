@@ -12,6 +12,7 @@ Group:      Development/Libraries
 License:    AGPLv3+
 Url:        http://pagekite.org/
 Source0:    http://pagekite.net/pk/src/%{name}-%{version}.tar.gz
+Source1:    %{name}.service
 
 %if 0%{?rhel} && 0%{?rhel} <= 5
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -20,9 +21,12 @@ BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:  noarch
 
 Requires:   python-SocksipyChain
+Requires:   setup
+#Requires(pre): shadow-utils
 Requires(postun): initscripts
 
-BuildRequires:  python-devel
+BuildRequires: python-devel
+BuildRequires: systemd
 
 %description
 PageKite is a system for running publicly visible servers (generally
@@ -60,24 +64,34 @@ install -Dpm 0755 scripts/lapcat $RPM_BUILD_ROOT%{_bindir}/lapcat
 
 install -Dpm 0644 etc/sysconfig/%{name}.fedora $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/%{name}
 install -Dpm 0644 etc/sysconfig/%{name}.fedora $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/%{name}
-install -Dpm 0755 etc/init.d/%{name}.fedora $RPM_BUILD_ROOT%{_initrddir}/%{name}
 install -Dpm 0644 etc/logrotate.d/%{name}.fedora $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/%{name}
+%if 0%{?rhel} && 0%{?rhel} <= 6
+  install -Dpm 0755 etc/init.d/%{name}.fedora $RPM_BUILD_ROOT%{_initrddir}/%{name}
+%else
+  install -Dpm 0644 %{SOURCE1} $RPM_BUILD_ROOT%{_unitdir}/%{name}.service
+%endif
 
-install -d $RPM_BUILD_ROOT%{_sysconfdir}/pagekite.d/default/
-install -Dpm 0644 etc/pagekite.d/* $RPM_BUILD_ROOT%{_sysconfdir}/pagekite.d/default/
-install -Dpm 0600 etc/pagekite.d/10_account.rc $RPM_BUILD_ROOT%{_sysconfdir}/pagekite.d/default/
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/%{name}.d/
+install -Dpm 0644 etc/%{name}.d/* $RPM_BUILD_ROOT%{_sysconfdir}/%{name}.d/
+install -Dpm 0600 etc/%{name}.d/10_account.rc $RPM_BUILD_ROOT%{_sysconfdir}/%{name}.d/
 
 install -Dpm 0644 doc/%{name}.1 $RPM_BUILD_ROOT%{_mandir}/man1/%{name}.1
 install -Dpm 0644 doc/lapcat.1 $RPM_BUILD_ROOT%{_mandir}/man1/lapcat.1
 
-install -d -m 0755 $RPM_BUILD_ROOT/%{_localstatedir}/log/pagekite
-
+install -d -m 0755 $RPM_BUILD_ROOT/%{_localstatedir}/log/%{name}
 
 %if 0%{?rhel} && 0%{?rhel} <= 5
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
 %endif
 
+
+#%pre
+#getent group %{name} >/dev/null || groupadd -r %{name}
+#getent passwd %{name} >/dev/null || \
+    #useradd -r -g %{name} -d %{python_sitelib}/%{name}/ -s /sbin/nologin \
+    #-c "PageKite daemon account" %{name}
+#exit 0
 
 %post
 /sbin/chkconfig --add %{name}
@@ -102,13 +116,18 @@ fi
 %{python_sitelib}/%{name}/
 %{_bindir}/%{name}
 %{_bindir}/lapcat
-%{_sysconfdir}/sysconfig/%{name}
-%{_initrddir}/%{name}
+%config %{_sysconfdir}/sysconfig/%{name}
+%if 0%{?rhel} && 0%{?rhel} <= 6
+  %{_initrddir}/%{name}
+%else
+  %{_unitdir}/%{name}.service
+%endif
 %{_sysconfdir}/logrotate.d/%{name}
-%{_sysconfdir}/pagekite.d/default/*
+%attr(660,root,root) %config %{_sysconfdir}/%{name}.d/*
 %{_mandir}/man1/%{name}.1*
 %{_mandir}/man1/lapcat.1*
-%{_localstatedir}/log/pagekite
+%{_localstatedir}/log/%{name}
+%ghost %{_localstatedir}/log/%{name}/%{name}.log
 
 
 %changelog

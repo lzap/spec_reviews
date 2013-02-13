@@ -22,7 +22,6 @@ BuildArch:  noarch
 
 Requires:   python-SocksipyChain
 Requires:   setup
-#Requires(pre): shadow-utils
 Requires(postun): initscripts
 
 BuildRequires: python-devel
@@ -86,13 +85,6 @@ install -d -m 0755 $RPM_BUILD_ROOT/%{_localstatedir}/log/%{name}
 %endif
 
 
-#%pre
-#getent group %{name} >/dev/null || groupadd -r %{name}
-#getent passwd %{name} >/dev/null || \
-    #useradd -r -g %{name} -d %{python_sitelib}/%{name}/ -s /sbin/nologin \
-    #-c "PageKite daemon account" %{name}
-#exit 0
-
 %post
 /sbin/chkconfig --add %{name}
 
@@ -116,14 +108,14 @@ fi
 %{python_sitelib}/%{name}/
 %{_bindir}/%{name}
 %{_bindir}/lapcat
-%config %{_sysconfdir}/sysconfig/%{name}
+%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %if 0%{?rhel} && 0%{?rhel} <= 6
   %{_initrddir}/%{name}
 %else
   %{_unitdir}/%{name}.service
 %endif
 %{_sysconfdir}/logrotate.d/%{name}
-%attr(660,root,root) %config %{_sysconfdir}/%{name}.d/*
+%attr(660,root,root) %config(noreplace) %{_sysconfdir}/%{name}.d/*
 %{_mandir}/man1/%{name}.1*
 %{_mandir}/man1/lapcat.1*
 %{_localstatedir}/log/%{name}

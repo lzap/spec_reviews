@@ -5,7 +5,7 @@
 
 Name:       pagekite
 Version:    0.5.5a
-Release:    1
+Release:    2
 Summary:    PageKite makes localhost servers visible to the world
 
 Group:      Development/Libraries
@@ -24,7 +24,7 @@ Requires:   python-SocksipyChain
 Requires:   setup
 Requires(postun): initscripts
 
-BuildRequires: python-devel
+BuildRequires: python2-devel
 BuildRequires: systemd
 
 %description
@@ -59,7 +59,6 @@ install -pm 0644 %{name}/proto/*py $RPM_BUILD_ROOT%{python_sitelib}/%{name}/prot
 install -pm 0644 %{name}/ui/*py $RPM_BUILD_ROOT%{python_sitelib}/%{name}/ui/
 
 install -Dpm 0755 scripts/%{name} $RPM_BUILD_ROOT%{_bindir}/%{name}
-install -Dpm 0755 scripts/lapcat $RPM_BUILD_ROOT%{_bindir}/lapcat
 
 install -Dpm 0644 etc/sysconfig/%{name}.fedora $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/%{name}
 install -Dpm 0644 etc/sysconfig/%{name}.fedora $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/%{name}
@@ -75,9 +74,17 @@ install -Dpm 0644 etc/%{name}.d/* $RPM_BUILD_ROOT%{_sysconfdir}/%{name}.d/
 install -Dpm 0600 etc/%{name}.d/10_account.rc $RPM_BUILD_ROOT%{_sysconfdir}/%{name}.d/
 
 install -Dpm 0644 doc/%{name}.1 $RPM_BUILD_ROOT%{_mandir}/man1/%{name}.1
-install -Dpm 0644 doc/lapcat.1 $RPM_BUILD_ROOT%{_mandir}/man1/lapcat.1
 
 install -d -m 0755 $RPM_BUILD_ROOT/%{_localstatedir}/log/%{name}
+
+# remove shebangs from library files
+for lib in $RPM_BUILD_ROOT%{python_sitelib}/%{name}/*.py \
+    $RPM_BUILD_ROOT%{python_sitelib}/%{name}/proto/*.py \
+    $RPM_BUILD_ROOT%{python_sitelib}/%{name}/ui/*.py ; do
+  sed '1{\@^#!/usr/bin/python.*@d}' $lib > $lib.new &&
+  touch -r $lib $lib.new &&
+  mv $lib.new $lib
+done
 
 %if 0%{?rhel} && 0%{?rhel} <= 5
 %clean
@@ -107,7 +114,6 @@ fi
 %doc COPYING README.md TODO.md
 %{python_sitelib}/%{name}/
 %{_bindir}/%{name}
-%{_bindir}/lapcat
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %if 0%{?rhel} && 0%{?rhel} <= 6
   %{_initrddir}/%{name}
@@ -117,11 +123,14 @@ fi
 %{_sysconfdir}/logrotate.d/%{name}
 %attr(660,root,root) %config(noreplace) %{_sysconfdir}/%{name}.d/*
 %{_mandir}/man1/%{name}.1*
-%{_mandir}/man1/lapcat.1*
 %{_localstatedir}/log/%{name}
 %ghost %{_localstatedir}/log/%{name}/%{name}.log
 
 
 %changelog
+* Wed Feb 20 2013 Lukas Zapletal <lzap+rpm[@]redhat.com> - 0.5.5a-2
+- Initial review
+- Removed lapcat from the distribution
+
 * Fri Feb 08 2013 Lukas Zapletal <lzap+rpm[@]redhat.com> - 0.5.5a-1
 - Initial version.

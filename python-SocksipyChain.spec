@@ -7,7 +7,7 @@
 
 Name:       python-%{canonicalname}
 Version:    2.0.12
-Release:    1
+Release:    2
 Summary:    A Python SOCKS/HTTP Proxy module
 
 Group:      Development/Libraries
@@ -21,7 +21,7 @@ BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:  noarch
 
-BuildRequires:  python-devel
+BuildRequires:  python2-devel
 
 
 %description
@@ -52,5 +52,8 @@ install -Dpm 0755 sockschain/__init__.py $RPM_BUILD_ROOT%{python_sitelib}/socksc
 %{python_sitelib}/sockschain
 
 %changelog
+* Wed Feb 20 2013 Lukas Zapletal <lzap+rpm[@]redhat.com> - 2.0.12-2
+- Initial package review fixes
+
 * Fri Feb 08 2013 Lukas Zapletal <lzap+rpm[@]redhat.com> - 2.0.12-1
 - Initial version.

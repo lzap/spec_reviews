@@ -15,6 +15,7 @@ BuildRequires: libXft-devel
 BuildRequires: libXScrnSaver-devel
 BuildRequires: libxdg-basedir-devel
 BuildRequires: dbus-devel
+BuildRequires: /usr/bin/pod2man
 
 %description
 Dunst is a highly configurable and lightweight notification daemon with the

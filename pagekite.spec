@@ -9,7 +9,7 @@ Release:    3%{?dist}
 Summary:    Makes localhost servers visible to the world
 
 Group:      Development/Libraries
-License:    AGPLv3+
+License:    AGPLv3+ and Public Domain
 Url:        http://pagekite.org/
 Source0:    http://pagekite.net/pk/src/%{name}-%{version}.tar.gz
 Source1:    %{name}.service

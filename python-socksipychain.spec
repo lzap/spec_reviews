@@ -3,17 +3,18 @@
   %{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 %endif
 
-%define canonicalname SocksipyChain
+%global canonicalname socksipychain
+%global upstreamname SocksipyChain
 
 Name:       python-%{canonicalname}
 Version:    2.0.12
-Release:    2
+Release:    3%{?dist}
 Summary:    A Python SOCKS/HTTP Proxy module
 
 Group:      Development/Libraries
 License:    BSD
 Url:        http://github.com/pagekite/Py%{canonicalname}
-Source0:    http://pagekite.net/pk/src/%{canonicalname}-%{version}.tar.gz
+Source0:    http://pagekite.net/pk/src/python-%{upstreamname}-%{version}.tar.gz
 
 %if 0%{?rhel} && 0%{?rhel} <= 5
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -31,7 +32,7 @@ TLS/SSL encryption if the OpenSSL modules are installed.
 
 
 %prep
-%setup -q -n %{canonicalname}-%{version}
+%setup -q -n python-%{upstreamname}-%{version}
 
 
 %build
@@ -52,6 +53,9 @@ install -Dpm 0755 sockschain/__init__.py $RPM_BUILD_ROOT%{python_sitelib}/socksc
 %{python_sitelib}/sockschain
 
 %changelog
+* Sat Apr 14 2013 Lukas Zapletal <lzap+rpm[@]redhat.com> - 2.0.12-3
+- Package review fixes
+
 * Wed Feb 20 2013 Lukas Zapletal <lzap+rpm[@]redhat.com> - 2.0.12-2
 - Initial package review fixes
 

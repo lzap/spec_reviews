@@ -1,11 +1,11 @@
 Name:     dunst
-Version:  0.5.0
+Version:  1.2.0
 Release:  1%{?dist}
 Summary:  Simple and configurable notification-daemon
 Group:    User Interface/X
 License:  BSD and MIT
-URL:      http://www.knopwob.org/dunst
-Source0:  http://www.knopwob.org/public/dunst-release/%{name}-%{version}.tar.bz2
+URL:      https://dunst-project.org
+Source0:  %{name}-%{version}.tar.gz
 
 Requires: dbus
 
@@ -14,8 +14,11 @@ BuildRequires: libXinerama-devel
 BuildRequires: libXft-devel
 BuildRequires: libXScrnSaver-devel
 BuildRequires: libxdg-basedir-devel
+BuildRequires: pango-devel
+BuildRequires: gtk2-devel
 BuildRequires: dbus-devel
 BuildRequires: /usr/bin/pod2man
+BuildRequires: systemd
 
 %description
 Dunst is a highly configurable and lightweight notification daemon with the
@@ -35,9 +38,10 @@ make install DESTDIR=%{buildroot} PREFIX=%{_prefix}
 
 
 %files
-%doc AUTHORS CHANGELOG LICENSE README.pod
+%doc AUTHORS CHANGELOG.md LICENSE README.md RELEASE_NOTES
 %{_bindir}/%{name}
 %{_datadir}/dbus-1/services/org.knopwob.%{name}.service
+%{_userunitdir}/%{name}.service
 %{_datadir}/%{name}
 %{_datadir}/man/man1/%{name}.1.gz
 

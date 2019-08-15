@@ -1,0 +1,5 @@
+#!/bin/bash
+
+for SPEC in SPECS/*spec; do
+  spectool -g -R "$SPEC"
+done

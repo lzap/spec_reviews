@@ -7,7 +7,8 @@ URL: https://github.com/HdrHistogram/%{name}
 Source0: https://github.com/HdrHistogram/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0: 0001-respect-flags.patch
 
-BuildRequires: gcc cmake
+BuildRequires: gcc g++ cmake zlib-devel
+Requires: zlib
 
 %description
 C port of High Dynamic Range (HDR) Histogram.

@@ -31,10 +31,9 @@ developing applications that use %{name}.
 
 
 %check
+ls test
 test/hdr_atomic_test
-test/hdr_histogram_log_test
-test/hdr_histogram_atomic_test
-test/hdr_histogram_atomic_concurrency_test
+test/hdr_histogram_test
 
 
 %install

@@ -12,5 +12,7 @@ Quick build:
   rpmbuild -ba package.spec
 
 Expand macros:
-
   rpmspec -P package.spec
+
+Package review
+  fedora-review -b 1234567

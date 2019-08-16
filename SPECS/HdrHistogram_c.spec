@@ -7,7 +7,7 @@ URL: https://github.com/HdrHistogram/%{name}
 Source0: https://github.com/HdrHistogram/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 Patch0: 0001-respect-flags.patch
 
-BuildRequires: cmake
+BuildRequires: gcc cmake
 
 %description
 C port of High Dynamic Range (HDR) Histogram.
@@ -30,14 +30,21 @@ developing applications that use %{name}.
 %make_build
 
 
+%check
+test/hdr_atomic_test
+test/hdr_histogram_log_test
+test/hdr_histogram_atomic_test
+test/hdr_histogram_atomic_concurrency_test
+
+
 %install
 rm -rf $RPM_BUILD_ROOT
 %make_install
 find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
-%post -p /sbin/ldconfig
+%ldconfig_post
 
-%postun -p /sbin/ldconfig
+%ldconfig_postun
 
 
 %files
@@ -53,6 +60,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %exclude %{_libdir}/libhdr_histogram_static.a
 
 %files devel
+%dir %{_includedir}/hdr
 %{_includedir}/hdr/hdr_thread.h
 %{_includedir}/hdr/hdr_interval_recorder.h
 %{_includedir}/hdr/hdr_writer_reader_phaser.h

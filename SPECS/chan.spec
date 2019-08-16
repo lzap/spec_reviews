@@ -52,7 +52,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_libdir}/lib%{name}.so.0
 
 %files devel
-%{_includedir}/%{name}
+%dir %{_includedir}/%{name}
 %{_includedir}/%{name}/queue.h
 %{_includedir}/%{name}/%{name}.h
 %{_libdir}/lib%{name}.so

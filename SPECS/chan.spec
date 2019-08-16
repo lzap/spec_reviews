@@ -6,7 +6,7 @@ License: ASL 2.0
 URL: https://github.com/tylertreat/%{name}
 Source0: https://github.com/tylertreat/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires: autoconf automake libtool
+BuildRequires: gcc autoconf automake libtool
 #Requires:       
 
 %description
@@ -31,15 +31,18 @@ developing applications that use %{name}.
 %configure --disable-static
 %make_build
 
+%check
+%make_build src/chan_test
+./src/chan_test
 
 %install
 rm -rf $RPM_BUILD_ROOT
 %make_install
 find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 
-%post -p /sbin/ldconfig
+%ldconfig_post
 
-%postun -p /sbin/ldconfig
+%ldconfig_postun
 
 
 %files
@@ -49,6 +52,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %{_libdir}/lib%{name}.so.0
 
 %files devel
+%{_includedir}/%{name}
 %{_includedir}/%{name}/queue.h
 %{_includedir}/%{name}/%{name}.h
 %{_libdir}/lib%{name}.so

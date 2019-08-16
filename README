@@ -1,1 +1,16 @@
 I use this repository for Fedora package reviews.
+
+Tips and tricks:
+
+Download source:
+  spectool -g -R package.spec
+
+Normal build:
+  rpmbuild -ba package.spec
+
+Quick build:
+  rpmbuild -ba package.spec
+
+Expand macros:
+
+  rpmspec -P package.spec

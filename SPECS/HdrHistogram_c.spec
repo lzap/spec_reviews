@@ -2,9 +2,10 @@ Name: HdrHistogram_c
 Version: 0.9.11
 Release: 1%{?dist}
 Summary: C port of the HdrHistogram 
-License: BSD 2 and Public Domain
+License: BSD and Public Domain
 URL: https://github.com/HdrHistogram/%{name}
 Source0: https://github.com/HdrHistogram/%{name}/archive/%{version}/%{name}-%{version}.tar.gz
+Patch0: 0001-respect-flags.patch
 
 BuildRequires: cmake
 
@@ -49,6 +50,7 @@ find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
 %exclude %{_bindir}/hdr_histogram_test
 %{_libdir}/libhdr_histogram.so.3.1.2
 %{_libdir}/libhdr_histogram.so.3
+%exclude %{_libdir}/libhdr_histogram_static.a
 
 %files devel
 %{_includedir}/hdr/hdr_thread.h

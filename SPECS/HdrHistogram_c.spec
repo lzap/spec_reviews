@@ -8,7 +8,6 @@ Source0: https://github.com/HdrHistogram/%{name}/archive/%{version}/%{name}-%{ve
 Patch0: 0001-respect-flags.patch
 
 BuildRequires: gcc g++ cmake zlib-devel
-Requires: zlib
 
 %description
 C port of High Dynamic Range (HDR) Histogram.

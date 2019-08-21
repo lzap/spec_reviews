@@ -1,0 +1,34 @@
+=pod
+=head1 NAME
+pmdasamba - Samba performance metrics domain agent (PMDA)
+=head1 DESCRIPTION
+B<pmdasamba> is a Performance Metrics Domain Agent (PMDA) which exports
+metric values from Samba, a Windows SMB/CIFS server for UNIX.
+In order for values to be made available by this PMDA, Samba must have
+been built with profiling support (WITH_PROFILE in "smbd -b" output).
+This PMDA dynamically enumerates much of its metric hierarchy, based on
+the contents of "smbstatus --profile".
+When the agent is installed (see below), the Install script will attempt
+to enable Samba statistics gathering, using "smbcontrol --profile".
+=head1 INSTALLATION
+If you want access to the names and values for the samba performance
+metrics, do the following as root:
+ # cd $PCP_PMDAS_DIR/samba
+ # ./Install
+If you want to undo the installation, do the following as root:
+ # cd $PCP_PMDAS_DIR/samba
+ # ./Remove
+B<pmdasamba> is launched by pmcd(1) and should never be executed
+directly.  The Install and Remove scripts notify pmcd(1) when
+the agent is installed or removed.
+=head1 FILES
+=over
+=item $PCP_PMDAS_DIR/samba/Install
+installation script for the B<pmdasamba> agent
+=item $PCP_PMDAS_DIR/samba/Remove
+undo installation script for the B<pmdasamba> agent
+=item $PCP_LOG_DIR/pmcd/samba.log
+default log file for error messages from B<pmdasamba>
+=back
+=head1 SEE ALSO
+pmcd(1), samba(7) and smbd(8).
